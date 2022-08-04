@@ -1,5 +1,7 @@
-import React, { useContext } from "react";
+import React, { useState } from "react";
+import { Platform } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useTheme } from "styled-components";
 
 import AppleSvg from "../../assets/apple.svg";
 import GoogleSvg from "../../assets/google.svg";
@@ -16,28 +18,32 @@ import {
   Footer,
   FooterWrapper,
 } from "./styles";
-import { Alert } from "react-native";
+import { ActivityIndicator, Alert } from "react-native";
 
 export const SignIn: React.FC = () => {
-  const { signInWithGoogle, AppleSignIn, user } = useAuth();
+  const { signInWithGoogle, AppleSignIn } = useAuth();
+  const theme = useTheme();
+  const [isLoading, setIsloading] = useState(false);
 
-  console.log(user);
   async function handleSignInWithGoogle() {
     try {
-      await signInWithGoogle();
+      setIsloading(true);
+      return await signInWithGoogle();
     } catch (error) {
       console.log(error);
       Alert.alert("Não foi possível conectar a conta google.");
     }
+    setIsloading(false);
   }
 
   async function handleAppleSignIn() {
     try {
-      await AppleSignIn();
+      return await AppleSignIn();
     } catch (error) {
       console.log(error);
       Alert.alert("Erro", "Não foi possível conectar com a conta Apple.");
     }
+    setIsloading(false);
   }
 
   return (
@@ -60,12 +66,21 @@ export const SignIn: React.FC = () => {
             svg={GoogleSvg}
             onPress={handleSignInWithGoogle}
           />
-          <SignInSocialButton
-            onPress={handleAppleSignIn}
-            title="Entrar com Apple"
-            svg={AppleSvg}
-          />
+          {Platform.OS === "ios" && (
+            <SignInSocialButton
+              onPress={handleAppleSignIn}
+              title="Entrar com Apple"
+              svg={AppleSvg}
+            />
+          )}
         </FooterWrapper>
+        {isLoading && (
+          <ActivityIndicator
+            color={theme.colors.shape}
+            size={25}
+            style={{ marginTop: 25 }}
+          />
+        )}
       </Footer>
     </Container>
   );

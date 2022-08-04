@@ -6,6 +6,9 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import { HighlightCard } from "../../components/HighlightCard";
 import { useTheme } from "styled-components";
+
+import { useAuth } from "../../hooks/auth";
+
 import {
   TransactionCard,
   TransactionCardProps,
@@ -44,8 +47,9 @@ interface HighlightData {
 }
 
 export const Dashboard: React.FC = () => {
+  const { signOut, user } = useAuth();
   const theme = useTheme();
-  const dataKey = "@gofinances:transactions";
+  const dataKey = `@gofinances:transactions_user:${user.id}`;
   const [isLoading, setIsloading] = useState(true);
   const [transactions, setTransactions] = useState<DataListProps[]>([]);
   const [highlightData, setHighlightData] = useState<HighlightData>(
@@ -56,12 +60,17 @@ export const Dashboard: React.FC = () => {
     collection: DataListProps[],
     type: "positive" | "negative"
   ) {
+    const collectionFilttered = collection.filter(
+      (transaction) => transaction.type === type
+    );
+    if (collectionFilttered.length === 0) return 0;
+
     const lastTransaction = new Date(
       Math.max.apply(
         Math,
-        collection
-          .filter((transaction) => transaction.type === type)
-          .map((transaction) => new Date(transaction.date).getTime())
+        collectionFilttered.map((transaction) =>
+          new Date(transaction.date).getTime()
+        )
       )
     );
     return `${lastTransaction.getDate()} de ${lastTransaction.toLocaleString(
@@ -115,7 +124,10 @@ export const Dashboard: React.FC = () => {
       transactions,
       "negative"
     );
-    const totalInterval = `01 a ${lastTransactionExpensives}`;
+    const totalInterval =
+      lastTransactionExpensives === 0
+        ? "Não há transações"
+        : `01 a ${lastTransactionExpensives}`;
 
     const total = entriesTotal - expensiveTotal;
     setHighlightData({
@@ -124,14 +136,20 @@ export const Dashboard: React.FC = () => {
           style: "currency",
           currency: "BRL",
         }),
-        lastTransaction: lastTransactionEntries,
+        lastTransaction:
+          lastTransactionEntries === 0
+            ? "Não há transações"
+            : `Última entrada dia ${lastTransactionEntries}`,
       },
       expensives: {
         amount: expensiveTotal.toLocaleString("pt-BR", {
           style: "currency",
           currency: "BRL",
         }),
-        lastTransaction: lastTransactionExpensives,
+        lastTransaction:
+          lastTransactionExpensives === 0
+            ? "Não há transações"
+            : `Última saida dia ${lastTransactionExpensives}`,
       },
       total: {
         amount: total.toLocaleString("pt-BR", {
@@ -163,15 +181,15 @@ export const Dashboard: React.FC = () => {
               <UserInfo>
                 <Photo
                   source={{
-                    uri: "https://avatars.githubusercontent.com/igorramon",
+                    uri: user.photo,
                   }}
                 />
                 <User>
                   <UserGreeting>Olá,</UserGreeting>
-                  <UserName>Igor Ramon</UserName>
+                  <UserName>{user.name}</UserName>
                 </User>
               </UserInfo>
-              <BorderlessButton onPress={() => {}}>
+              <BorderlessButton onPress={signOut}>
                 <Icon name="power" />
               </BorderlessButton>
             </UserWrapper>
@@ -180,13 +198,13 @@ export const Dashboard: React.FC = () => {
             <HighlightCard
               title="Entrada"
               amount={highlightData?.entries?.amount}
-              lastTransaction={`Última entrada dia ${highlightData.entries.lastTransaction}`}
+              lastTransaction={`${highlightData.entries.lastTransaction}`}
               type="up"
             />
             <HighlightCard
               title="Saídas"
               amount={highlightData?.expensives?.amount}
-              lastTransaction={`Última entrada dia ${highlightData.expensives.lastTransaction}`}
+              lastTransaction={`${highlightData.expensives.lastTransaction}`}
               type="down"
             />
             <HighlightCard

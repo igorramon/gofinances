@@ -1,4 +1,10 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
 import * as AuthSession from "expo-auth-session";
 import * as AppleAuthentication from "expo-apple-authentication";
 import Storage from "@react-native-async-storage/async-storage";
@@ -18,6 +24,8 @@ interface IAuthContextData {
   user: User;
   signInWithGoogle(): Promise<void>;
   AppleSignIn(): Promise<void>;
+  signOut(): Promise<void>;
+  userStorageLoading: boolean;
 }
 
 interface AuthorizationResponse {
@@ -29,12 +37,14 @@ interface AuthorizationResponse {
 
 const { CLIENT_ID } = process.env;
 const { REDIRECT_URI } = process.env;
+
 const storageCollectionKey = "@gofinances:user";
 
 const AuthContext = createContext({} as IAuthContextData);
 
 function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>({} as User);
+  const [userStorageLoading, setUserStorageLoading] = useState(true);
 
   async function signInWithGoogle() {
     try {
@@ -97,8 +107,25 @@ function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  async function signOut() {
+    setUser({} as User);
+    await Storage.removeItem(storageCollectionKey)
+  }
+
+  useEffect(() => {
+    async function loadUserStorageData() {
+      const userStoraged = await Storage.getItem(storageCollectionKey);
+      if (userStoraged) {
+        const userLogged = JSON.parse(userStoraged) as User;
+        setUser(userLogged);
+      }
+      setUserStorageLoading(false);
+    }
+    loadUserStorageData();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, signInWithGoogle, AppleSignIn }}>
+    <AuthContext.Provider value={{ user, signInWithGoogle, AppleSignIn, signOut, userStorageLoading }}>
       {children}
     </AuthContext.Provider>
   );

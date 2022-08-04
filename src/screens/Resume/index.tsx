@@ -24,8 +24,7 @@ import {
 
 import { categories } from "../../utils/categories";
 import { RFValue } from "react-native-responsive-fontsize";
-
-const dataKey = "@gofinances:transactions";
+import { useAuth } from "../../hooks/auth";
 
 interface TransactionData {
   type: "positive" | "negative";
@@ -46,6 +45,8 @@ interface CategoryData {
 
 export const Resume: React.FC = () => {
   const theme = useTheme();
+  const { user } = useAuth();
+  const dataKey = `@gofinances:transactions_user:${user.id}`;
   const [isLoading, setIsloading] = useState(true);
   const [totalByCategories, setTotalByCategories] = useState<CategoryData[]>(
     []

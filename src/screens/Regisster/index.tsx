@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Keyboard, TouchableWithoutFeedback, Alert } from "react-native";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
@@ -23,6 +23,8 @@ import {
   TransactionTypes,
 } from "./styles";
 import { FormData } from "../../components/Forms/InputForm";
+import { useAuth } from "../../hooks/auth";
+
 const schema = Yup.object().shape({
   name: Yup.string().required("Nome é obrigatório"),
   amount: Yup.number()
@@ -30,11 +32,14 @@ const schema = Yup.object().shape({
     .positive("O valor não pode ser negativo")
     .required("O valor é obrigatório"),
 });
-const dataKey = "@gofinances:transactions";
+
 type NavigationProps = {
   navigate: (screen: string) => void;
 };
+
 export const Regisster: React.FC = () => {
+  const { user } = useAuth();
+  const dataKey = `@gofinances:transactions_user:${user.id}`;
   const navigation = useNavigation<NavigationProps>();
   const {
     control,
