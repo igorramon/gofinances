@@ -55,7 +55,11 @@ export const SignIn: React.FC = () => {
       </Header>
       <Footer>
         <FooterWrapper>
-          <SignInSocialButton title="Entrar com Google" svg={GoogleSvg} />
+          <SignInSocialButton
+            title="Entrar com Google"
+            svg={GoogleSvg}
+            onPress={handleSignInWithGoogle}
+          />
           <SignInSocialButton
             onPress={handleAppleSignIn}
             title="Entrar com Apple"
