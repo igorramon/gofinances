@@ -1,5 +1,6 @@
 import React from "react";
 import { categories } from "../../utils/categories";
+import { BorderlessButton } from "react-native-gesture-handler";
 
 import {
   Container,
@@ -10,6 +11,9 @@ import {
   Icon,
   CategoryName,
   Date,
+  HeaderCard,
+  SectionButtons,
+  Button,
 } from "./styles";
 
 export interface TransactionCardProps {
@@ -18,17 +22,29 @@ export interface TransactionCardProps {
   amount: string;
   category: string;
   date: string;
+  id: string;
 }
 
 export interface Props {
   data: TransactionCardProps;
+  handleDelete(id: string): Promise<void>;
 }
-export const TransactionCard: React.FC<Props> = ({ data }) => {
+export const TransactionCard: React.FC<Props> = ({ data, handleDelete }) => {
   const [category] = categories.filter((item) => item.key === data.category);
 
   return (
     <Container>
-      <Title>{data.name}</Title>
+      <HeaderCard>
+        <Title>{data.name}</Title>
+        <SectionButtons>
+          <Button onPress={() => {}}>
+            <Icon name="edit" isButton />
+          </Button>
+          <Button onPress={() => handleDelete(data.id)}>
+            <Icon name="trash" isButton />
+          </Button>
+        </SectionButtons>
+      </HeaderCard>
       <Amount type={data.type}>
         {data.type === "negative" && "- "}
         {data.amount}

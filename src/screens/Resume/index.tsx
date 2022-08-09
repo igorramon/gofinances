@@ -78,7 +78,7 @@ export const Resume: React.FC = () => {
       },
       0
     );
-    console.log(expensivesTotal);
+
     const totalByCategory: CategoryData[] = [];
     categories.forEach((category) => {
       let categorySum = 0;

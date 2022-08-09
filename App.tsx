@@ -1,4 +1,4 @@
-import "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React from "react";
 import { StatusBar } from "react-native";
 import AppLoading from "expo-app-loading";
@@ -31,9 +31,11 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <StatusBar backgroundColor="#5636d3" translucent />
-      <AuthProvider>
-        <Routes />
-      </AuthProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }

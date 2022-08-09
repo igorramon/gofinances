@@ -83,7 +83,6 @@ export const Dashboard: React.FC = () => {
     const response = await AsyncStorage.getItem(dataKey);
 
     const transactions = response ? JSON.parse(response) : [];
-
     let entriesTotal = 0;
     let expensiveTotal = 0;
 
@@ -99,6 +98,7 @@ export const Dashboard: React.FC = () => {
           style: "currency",
           currency: "BRL",
         });
+
         const date = Intl.DateTimeFormat("pt-BR", {
           day: "2-digit",
           month: "2-digit",
@@ -162,6 +162,27 @@ export const Dashboard: React.FC = () => {
     setIsloading(false);
   }
 
+  async function handleDeleteTransaction(id: string) {
+    const transactionsWithoutDelete = transactions
+      .filter((transaction) => transaction.id !== id)
+      .map((item) => {
+        return {
+          amount: Number(item.amount.replace(/[^0-9]/g, ""))/100,
+          category: item.category,
+          date: item.date,
+          id: item.id,
+          name: item.name,
+          type: item.type,
+        };
+      });
+
+    await AsyncStorage.setItem(
+      dataKey,
+      JSON.stringify(transactionsWithoutDelete)
+    );
+    loadTransactions();
+  }
+
   useFocusEffect(
     useCallback(() => {
       loadTransactions();
@@ -219,7 +240,12 @@ export const Dashboard: React.FC = () => {
             <TransactionList
               data={transactions}
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) => <TransactionCard data={item} />}
+              renderItem={({ item }) => (
+                <TransactionCard
+                  data={item}
+                  handleDelete={handleDeleteTransaction}
+                />
+              )}
             />
           </Transactions>
         </>
