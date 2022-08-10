@@ -37,9 +37,6 @@ export const TransactionCard: React.FC<Props> = ({ data, handleDelete }) => {
       <HeaderCard>
         <Title>{data.name}</Title>
         <SectionButtons>
-          <Button onPress={() => {}}>
-            <Icon name="edit" isButton />
-          </Button>
           <Button onPress={handleDelete}>
             <Icon name="trash" isButton />
           </Button>
