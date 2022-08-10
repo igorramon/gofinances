@@ -37,7 +37,7 @@ export const SectionButtons = styled.View`
   align-items: center;
 `;
 
-export const Button = styled(BorderlessButton)<ButtonProps>`
+export const Button = styled.TouchableOpacity`
   margin-left: ${RFValue(10)}px;
 `;
 

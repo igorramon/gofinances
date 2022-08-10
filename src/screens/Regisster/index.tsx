@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Modal, Keyboard, TouchableWithoutFeedback, Alert } from "react-native";
+import React, { useState, useCallback } from "react";
+import { Modal, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,6 +8,7 @@ import uuid from "react-native-uuid";
 import { useNavigation } from "@react-navigation/native";
 
 import { Button } from "../../components/Forms/Button";
+import Alert from "../../components/Alert";
 import { CategorySelectButton } from "../../components/Forms/CategorySelectButton";
 import { InputForm } from "../../components/Forms/InputForm";
 import { TransactionTypeButton } from "../../components/Forms/TransactionTypeButton";
@@ -55,9 +56,14 @@ export const Regisster: React.FC = () => {
     key: "category",
     name: "Categoria",
   });
+  const [visible, setVisible] = React.useState(false);
+
+  const toggleAlert = useCallback(() => {
+    setVisible(!visible);
+  }, [visible]);
 
   async function handleRegister(form: FormData) {
-    if (!transactionType) return Alert.alert("Selecione o tipo da transação");
+    if (!transactionType) return toggleAlert();
 
     if (category.key === "category")
       return Alert.alert("Selecione a categoria");
@@ -151,6 +157,13 @@ export const Regisster: React.FC = () => {
             closeSelectCategory={hanldeCloseSelectCategory}
           />
         </Modal>
+        <Alert
+          icon="alert-triangle"
+          isVisible={visible}
+          text="Selecione o tipo da transação"
+          confirm={toggleAlert}
+          color="orange"
+        />
       </Container>
     </TouchableWithoutFeedback>
   );

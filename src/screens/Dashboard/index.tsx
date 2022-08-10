@@ -30,6 +30,7 @@ import {
   TransactionList,
   LoadContainer,
 } from "./styles";
+import Alert from "../../components/Alert";
 
 export interface DataListProps extends TransactionCardProps {
   id: string;
@@ -54,6 +55,16 @@ export const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<DataListProps[]>([]);
   const [highlightData, setHighlightData] = useState<HighlightData>(
     {} as HighlightData
+  );
+  const [visible, setVisible] = React.useState(false);
+  const [id, setId] = useState("");
+
+  const toggleAlert = useCallback(
+    (id?: string) => {
+      setVisible(!visible);
+      if (id) setId(id);
+    },
+    [visible]
   );
 
   function getLastTransactionDate(
@@ -162,14 +173,20 @@ export const Dashboard: React.FC = () => {
     setIsloading(false);
   }
 
-  async function handleDeleteTransaction(id: string) {
+  async function handleDeleteTransaction() {
+    toggleAlert();
+    if (!id) return;
     const transactionsWithoutDelete = transactions
       .filter((transaction) => transaction.id !== id)
       .map((item) => {
         return {
-          amount: Number(item.amount.replace(/[^0-9]/g, ""))/100,
+          amount: Number(item.amount.replace(/[^0-9]/g, "")) / 100,
           category: item.category,
-          date: item.date,
+          date: Intl.DateTimeFormat("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+          }).format(new Date(item.date)),
           id: item.id,
           name: item.name,
           type: item.type,
@@ -181,6 +198,7 @@ export const Dashboard: React.FC = () => {
       JSON.stringify(transactionsWithoutDelete)
     );
     loadTransactions();
+    setId("");
   }
 
   useFocusEffect(
@@ -243,13 +261,21 @@ export const Dashboard: React.FC = () => {
               renderItem={({ item }) => (
                 <TransactionCard
                   data={item}
-                  handleDelete={handleDeleteTransaction}
+                  handleDelete={() => toggleAlert(item.id)}
                 />
               )}
             />
           </Transactions>
         </>
       )}
+      <Alert
+        icon="trash"
+        isVisible={visible}
+        text="Deseja realmente excluir essa transação?"
+        confirm={handleDeleteTransaction}
+        cancel={toggleAlert}
+        color="red"
+      />
     </Container>
   );
 };

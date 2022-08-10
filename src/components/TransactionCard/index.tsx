@@ -27,7 +27,7 @@ export interface TransactionCardProps {
 
 export interface Props {
   data: TransactionCardProps;
-  handleDelete(id: string): Promise<void>;
+  handleDelete(): void;
 }
 export const TransactionCard: React.FC<Props> = ({ data, handleDelete }) => {
   const [category] = categories.filter((item) => item.key === data.category);
@@ -40,7 +40,7 @@ export const TransactionCard: React.FC<Props> = ({ data, handleDelete }) => {
           <Button onPress={() => {}}>
             <Icon name="edit" isButton />
           </Button>
-          <Button onPress={() => handleDelete(data.id)}>
+          <Button onPress={handleDelete}>
             <Icon name="trash" isButton />
           </Button>
         </SectionButtons>

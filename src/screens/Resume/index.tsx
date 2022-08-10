@@ -115,7 +115,7 @@ export const Resume: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       loadData();
-    }, [selectedDate])
+    }, [selectedDate, totalByCategories])
   );
 
   return (
